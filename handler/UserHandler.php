@@ -22,15 +22,15 @@ class UserHandler extends Handler {
      * @param string $desc
      * @return boolean
      */
-    function createUser($name, $password, $mail, $sex, $desc) {
-        $sql = "INSERT INTO " . T_USERS . " (".U_MAIL.",".U_NAME.",".U_SEX.",".U_DESC.",".U_STATUS.",".U_ACTIVE.",".U_CREATED_AT.",".U_PASS_HASH.",".U_API_KEY.")"
-                . "VALUES (?,?,?,?,?,?,now(),?,?)";
+    function createUser($name, $password, $mail, $age, $sex, $age, $desc) {
+        $sql = "INSERT INTO " . T_USERS . " (".U_MAIL.",".U_NAME.",".U_SEX.",".U_AGE.",".U_DESC.",".U_STATUS.",".U_ACTIVE.",".U_CREATED_AT.",".U_PASS_HASH.",".U_API_KEY.")"
+                . "VALUES (?,?,?,?,?,?,?,now(),?,?)";
         $passHash = PassHash::hash($password);
         $apiKey = generateApiKey();
         while($this->isApiKeyExist($apiKey)) $apiKey = generateApiKey();
         $status = DEFAULT_USER_STATUS;
         $active = DEFAULT_USER_ACTIVE;
-        $params = array($mail, $name, $sex, $desc, $status, $active, $passHash, $apiKey);
+        $params = array($mail, $name, $sex, $age, $desc, $status, $active, $passHash, $apiKey);
         return parent::preparedUpdate($sql, $params);
     }
     
@@ -64,7 +64,7 @@ class UserHandler extends Handler {
     function getUserByMail($mail) {
         $sql = "SELECT * FROM " . T_USERS . " WHERE " . U_MAIL . " = ?";
         $params = array($mail);
-        return parent::preparedQuery($sql, $params, PDO::FETCH_ASSOC);
+        return parent::preparedQueryFirst($sql, $params, PDO::FETCH_ASSOC);
     }
     
     /**
@@ -75,7 +75,7 @@ class UserHandler extends Handler {
     function getUserById($id) {
         $sql = "SELECT * FROM " . T_USERS . " WHERE " . U_ID . " = ?";
         $params = array($id);
-        return parent::preparedQuery($sql, $params, PDO::FETCH_ASSOC);
+        return parent::preparedQueryFirst($sql, $params, PDO::FETCH_ASSOC);
     }
     
     /**
@@ -86,7 +86,7 @@ class UserHandler extends Handler {
     function getUserByApiKey($apiKey) {
         $sql = "SELECT * FROM " . T_USERS . " WHERE " . U_API_KEY . " = ?";
         $params = array($apiKey);
-        return parent::preparedQuery($sql, $params, PDO::FETCH_ASSOC);
+        return parent::preparedQueryFirst($sql, $params, PDO::FETCH_ASSOC);
     } 
     
     /**
@@ -191,6 +191,47 @@ class UserHandler extends Handler {
         $status = USER_NOT_ACTIVE;
         $params = array($id, $status);
         return (parent::preparedQueryCount($sql, $params)>0);
+    }
+    
+    /**
+     * Set the last connection time at now()
+     * @param int $id
+     * @return boolean
+     */
+    public function setUserLastConn($id) {
+        $sql = "UPDATE " . T_USERS . " SET " . U_LAST_CONN . " = now() WHERE " . U_ID . " = ?";
+        $params = array($id);
+        return parent::preparedUpdate($sql, $params);
+    }
+    
+    public function deleteUser($id) {
+        $this->conn->beginTransaction();
+        $sql = "DELETE FROM " . T_BLACKLIST . " WHERE " . B_RECEIVER . " = ? OR " . B_SENDER . " = ?";
+        $params = array($id, $id);
+        if(!parent::preparedUpdate($sql, $params)) return false;
+        
+        $sql = "DELETE FROM " . T_CONTACTS . " WHERE " . C_RECEIVER . " = ? OR " . C_SENDER . " = ?";
+        $params = array($id, $id);
+        if(!parent::preparedUpdate($sql, $params)) return false;
+        
+        $sql = "DELETE FROM " . T_MESSAGES . " WHERE " . M_SENDER . " = ? OR " . M_RECEIVER . " = ?";
+        $params = array($id, $id);
+        if(!parent::preparedUpdate($sql, $params)) return false;
+        
+        $sql = "DELETE FROM " . T_INVITATIONS . " WHERE " . I_SENDER . " = ? OR " . I_RECEIVER . " = ?";
+        $params = array($id, $id);
+        if(!parent::preparedUpdate($sql, $params)) return false;
+        
+        $sql = "DELETE FROM " . T_PICTURES . " WHERE " . P_USER . " = ?";
+        $params = array($id);
+        if(!parent::preparedUpdate($sql, $params)) return false;
+        
+        $sql = "DELETE FROM " . T_USERS . " WHERE " . U_ID . " = ?";
+        $params = array($id);
+        if(!parent::preparedUpdate($sql, $params)) return false;
+        
+        $this->conn->commit();
+        return true;
     }
 
 }

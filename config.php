@@ -13,6 +13,7 @@ define('U_ID', 'iduser');
 define('U_MAIL', 'mail');
 define('U_NAME', 'name');
 define('U_SEX', 'sex');
+define('U_AGE', 'age');
 define('U_DESC', 'description');
 define('U_STATUS', 'status');
 define('U_ACTIVE', 'active');
@@ -41,16 +42,27 @@ define('T_CONTACTS', 'contacts');
 define('C_SENDER', 'sender');
 define('C_RECEIVER', 'receiver');
 
-/* WHODELETEDWHO TABLE CONSTANTS */
-define('T_WHODELWHO', 'whodeletedwho');
-define('W_SENDER', 'sender');
-define('W_RECEIVER', 'receiver');
+/* BLACKLIST TABLE CONSTANTS */
+define('T_BLACKLIST', 'blacklist');
+define('B_SENDER', 'sender');
+define('B_RECEIVER', 'receiver');
+
+/* MESSAGES TABLE CONSTANTS */
+define('T_MESSAGES', 'messages');
+define('M_ID', 'idmessage');
+define('M_CONTENT', 'content');
+define('M_SENTAT', 'sent_at');
+define('M_SENDER', 'sender');
+define('M_RECEIVER', 'receiver');
+define('M_VIEWAT', 'view_at');
 
 
 /* MESSAGES */
 // REGISTER
 define('REGISTER_SUCCESS', 'Registered with success !');
 define('REGISTER_ERROR', 'An error was detected while registering...');
+define('UNREGISTER_SUCCESS', 'An error was detected while unregistering...');
+define('UNREGISTER_ERROR', 'Unregistered with success !');
 define('USER_ALREADY_EXISTED', 'This mail is already used...');
 define('USER_EXISTS', 'This mail is already used...');
 define('USER_NOT_EXISTS', 'This user does not exist !');
@@ -94,12 +106,23 @@ define('CANCEL_INVITATION_ERROR', 'An error was detected while cancelling this i
 define('GET_INVITATIONS_SUCCESS', 'Invitations loaded with success !');
 define('GET_INVITATIONS_ERROR', 'An error was detected while getting your invitations...');
 define('GET_SENDER_ERROR', 'An error was detected while getting sender informations...');
+define('ALREADY_YOUR_CONTACT', 'This user is already in your contact list...');
+define('BLACKLISTED', 'This user backlisted you ! Sorry ;)');
 
 // CONTACT
 define('CONTACT_DOES_NOT_EXIST', 'This contact does not exit !');
 define('DELETE_CONTACT_YOURSELF', 'You cannot delete yourself as contact...');
 define('DELETE_CONTACT_ERROR', 'An error was detected while deleting contact...');
 define('DELETE_CONTACT_SUCCESS', 'Contact deleted !');
+define('BLACKLIST_ERROR', 'An error was detected while adding this contact in your black list...');
+define('BLACKLIST_SUCCESS', 'Blacklisted with success !');
+define('BLACKLIST_YOURSELF_ERROR', 'You cannot blacklisted yourself...');
+define('ALREADY_BLACKLISTED', 'This contact is already in you black list...');
+
+// MESSAGE
+define('MESSAGE_YOURSELF', 'You cannot send a message to yourself...');
+define('MESSAGE_SENT_SUCCESS', 'Message sent !');
+define('MESSAGE_SENT_ERROR', 'An error was detected while sending the message...');
 
 // API
 define('API_KEY_MISSING', 'The Api Key is missing !');
@@ -108,10 +131,14 @@ define('INVALID_API_KEY', 'Your Api Key is invalid...');
 // GETTER
 define('GET_USER_SUCCESS', 'User loaded with success !');
 define('GET_USER_ERROR', 'An error was detected while getting user...');
+define('GET_MESSAGES_SUCCESS', 'Messages loaded with success !');
+define('GET_MESSAGES_ERROR', 'An error was detected while getting messages...');
 
 // SETTER
 define('SET_USER_SUCCESS', 'User set with success !');
 define('SET_USER_ERROR', 'An error was detected while setting user...');
+define('SET_VIEWAT_MESSAGES_SUCCESS', 'Update message view at with success !');
+define('SET_VIEWAT_MESSAGES_ERROR', 'An error was detected while setting view at messages...');
 
 
 /* CODE CONSTANTS */
@@ -124,6 +151,9 @@ define('USER_NOT_ACTIVE', 0);
 define('INVITATION_PENDING', 0);
 define('INVITATION_REJECTED', 1);
 define('INVITATION_ACCEPTED', 2);
+define('MESSAGE_DEFAULT_STATUS', 0);
+define('MESSAGE_NOT_VIEWED', 0);
+define('MESSAGE_VIEWED', 1);
 
 
 /* INT CONSTANTS */

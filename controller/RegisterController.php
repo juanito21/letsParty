@@ -20,6 +20,7 @@ class RegisterController {
         $this->helper = $myHelper;
         $this->uh = new UserHandler($myConn);
         $this->register();
+        $this->unregister();
         $this->isNewUser();
     }
     
@@ -30,7 +31,7 @@ class RegisterController {
     public function register() {
         $app = \Slim\Slim::getInstance();
         $app->post('/register', function() use ($app) {
-            $fields = array('name', 'mail', 'password', 'sex', 'desc');
+            $fields = array('name', 'mail', 'password', 'sex', 'age', 'desc');
             $this->helper->verifyRequiredParams($fields);
             $params = $this->helper->constructParamsArray($fields, 'post');
             
@@ -41,11 +42,25 @@ class RegisterController {
                                                 $params['password'],
                                                 $params['mail'],
                                                 $params['sex'],
+                                                $params['age'],
                                                 $params['desc']);
                 if($res) $this->helper->simpleRender(REGISTER_SUCCESS, false, 201);
                 else $this->helper->simpleRender(REGISTER_ERROR, true, 200);
             } else $this->helper->simpleRender(USER_ALREADY_EXISTED, true, 200);
         });
+    }
+    
+        
+    public function unregister() {
+        $app = \Slim\Slim::getInstance();  
+        $app->delete('/unregister', function() use ($app) { 
+            global $userId;
+            $res = $this->uh->deleteUser($userId);
+            if($res) {
+                deletePicturesFromDiskByUser($userId);
+                $this->helper->simpleRenderData(UNREGISTER_SUCCESS, false, 200, $res);
+            } else $this->helper->simpleRender(UNREGISTER_ERROR, true, 200);
+        }); 
     }
     
     /**

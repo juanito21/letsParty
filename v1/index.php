@@ -12,6 +12,7 @@ require_once '../controller/UserController.php';
 require_once '../controller/PictureController.php';
 require_once '../controller/InvitationController.php';
 require_once '../controller/ContactController.php';
+require_once '../controller/MessageController.php';
 require_once '../middleware/OAuth2Auth.php';
 require_once '../include/functions.php';
 require_once '../config.php';
@@ -36,6 +37,7 @@ new UserController($helper, $conn);
 new PictureController($helper, $conn);
 new InvitationController($helper, $conn);
 new ContactController($helper, $conn);
+new MessageController($helper, $conn);
 
 $db->close();
 

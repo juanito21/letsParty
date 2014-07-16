@@ -25,7 +25,12 @@ class OAuth2Auth extends \Slim\Middleware {
                                 '/cancelInvitation',
                                 '/disconnect',
                                 '/getInvitations',
-                                '/deleteContact'
+                                '/deleteContact',
+                                '/getMessages',
+                                '/sendMessage',
+                                '/viewMessages',
+                                '/addBlackListedContact',
+                                '/unregister'
                             );
     }
     
@@ -61,6 +66,9 @@ class OAuth2Auth extends \Slim\Middleware {
                     } catch (Exception $e) {
                         exit();
                     }
+                } else {
+                    // Everything is OK, update of the last connection time...
+                    $this->uh->setUserLastConn($userId);
                 }
             }
         }  else {

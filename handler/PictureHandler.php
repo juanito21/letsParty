@@ -43,12 +43,22 @@ class PictureHandler extends Handler {
         return $name;
     }
     
+    /**
+     * Get the number of user's picture
+     * @param int $id
+     * @return int
+     */
     function getNumberOfPictureByUser($id) {
         $sql = "SELECT COUNT(*) FROM " . T_PICTURES . " WHERE " . P_USER . " = ?";
         $params = array($id);
         return parent::preparedQueryCount($sql, $params);
     }
     
+    /**
+     * Delete a picture in the database
+     * @param string $name
+     * @return boolean
+     */
     function deletePicture($name) {
        $sql = "DELETE FROM " . T_PICTURES . " WHERE " . P_NAME . " = ?";
        $params = array($name);

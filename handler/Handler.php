@@ -23,7 +23,7 @@ abstract class Handler {
      * @param int $mode
      * @return array else false if there is any error
      */
-    public function preparedQuery($sql, $params, $mode) {
+    public function preparedQueryFirst($sql, $params, $mode) {
         $res = false;
         try {
             $stmnt = $this->conn->prepare($sql);
@@ -32,6 +32,28 @@ abstract class Handler {
             }
             $stmnt->execute();
             $res = $stmnt->fetch($mode);
+            $stmnt->closeCursor();
+        } catch (Exception $e) {
+            echo 'Exception -> ';var_dump($e->getMessage());
+        } return $res;
+    }
+    
+    /**
+     * Make a prepare query and execute it
+     * @param string $sql
+     * @param array $params
+     * @param int $mode
+     * @return array else false if there is any error
+     */
+    public function preparedQueryAll($sql, $params, $mode) {
+        $res = false;
+        try {
+            $stmnt = $this->conn->prepare($sql);
+            foreach($params as $key => &$param) {
+                $stmnt->bindParam($key+1,$param);
+            }
+            $stmnt->execute();
+            $res = $stmnt->fetchAll($mode);
             $stmnt->closeCursor();
         } catch (Exception $e) {
             echo 'Exception -> ';var_dump($e->getMessage());

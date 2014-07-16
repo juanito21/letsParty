@@ -107,7 +107,7 @@ class Helper {
      */
     function simpleRenderData($message, $error, $code, $data) {
         $infos =  array('message'=>$message,'error'=>$error);
-        $allData = array_merge($infos, array($data));
+        $allData = array_merge($infos, $data);
         return $this->render($code, $allData);
     }
  

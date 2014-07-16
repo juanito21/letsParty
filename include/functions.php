@@ -47,6 +47,11 @@
         return unlink(PATH_ROOT . "/" . PATH_IMG ."/" . $name);
     }
     
+    /**
+     * Get the dif between a date and now in hour
+     * @param DateTime $date
+     * @return int (h)
+     */
     function getDiffHour($date) {
         $current = new DateTime();
         $current->setTimestamp(time());
@@ -54,5 +59,14 @@
         $diff = $current->diff($res);
         return $diff->h;
     }
-?>
+    
+    /**
+     * Delete all the user's pictures
+     * @param int $id
+     */
+    function deletePicturesFromDiskByUser($id) {
+        foreach (glob(PATH_ROOT . "/" . PATH_IMG ."/" . $id . "_*") as $filename) {
+            unlink($filename);
+        }
+    }
 

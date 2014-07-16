@@ -3,7 +3,7 @@ require_once '../handler/UserHandler.php';
 require_once '../handler/ContactHandler.php';
 require_once '../handler/InvitationHandler.php';
 /**
- * Description of InvitationController
+ * Handle the invitation actions
  *
  * @author Jean
  */
@@ -31,6 +31,9 @@ class InvitationController {
         $this->getInvitations();
     }
     
+    /*
+     * Send an invitation, matched by HTTP POST method
+     */
     public function sendInvitation() {
         $app = \Slim\Slim::getInstance();
         $app->post('/sendInvitation', function() use ($app) {
@@ -56,13 +59,22 @@ class InvitationController {
                     $this->helper->simpleRender(INVITATION_ALREADY_REJECTED, true, 200);
                     return;   
                 } $exist = true;
-            } if(!$this->ih->addInvitation($userId, $params['id'], $exist)) {
+            } else if($this->ch->isContactExist($userId, $params['id'])) {
+                $this->helper->simpleRender(ALREADY_YOUR_CONTACT, true, 200);
+                return;
+            } else if($this->ch->isBlackListed($params['id'], $userId)) {
+                $this->helper->simpleRender(BLACKLISTED, true, 200);
+                return;
+            } else if(!$this->ih->addInvitation($userId, $params['id'], $exist)) {
                 $this->helper->simpleRender(SEND_INVITATION_ERROR, true, 200);
                 return;
             } else $this->helper->simpleRender(SEND_INVITATION_SUCCESS, false, 201);
         });
     }
     
+    /**
+     * Reject an invitation, matched by HTTP PUT method
+     */
     public function rejectInvitation() {
         $app = \Slim\Slim::getInstance();
         $app->put('/rejectInvitation/:id', function($id) use ($app) {
@@ -83,6 +95,9 @@ class InvitationController {
         });
     }
     
+    /**
+     * Accept an invitation, matched by HTTP POST method
+     */
     public function acceptInvitation() {
         $app = \Slim\Slim::getInstance();
         $app->post('/acceptInvitation', function() use ($app) {
@@ -91,7 +106,7 @@ class InvitationController {
             $params = $this->helper->constructParamsArray($fields, 'post');
             global $userId;
             if($userId == $params['id']) {
-               $this->helper->simpleRender (ACCEPT_YOURSELF_ERROR, true, 200);
+                $this->helper->simpleRender (ACCEPT_YOURSELF_ERROR, true, 200);
                 return; 
             } else if(!$this->uh->isUserExistById($params['id'])) {
                 $this->helper->simpleRender(USER_NOT_EXISTS, true, 200);
@@ -106,6 +121,9 @@ class InvitationController {
         });
     }
     
+    /**
+     * Cancel an invitation, matched by HTTP DELETE method
+     */
     public function cancelInvitation() {
         $app = \Slim\Slim::getInstance();
         $app->delete('/cancelInvitation/:receiver', function($receiver) use ($app) {
@@ -126,6 +144,9 @@ class InvitationController {
         });
     }
     
+    /**
+     * Get my invitations, matched by HTTP GET method
+     */
     public function getInvitations() {
         $app = \Slim\Slim::getInstance();
         $app->get('/getInvitations', function() use ($app) {
