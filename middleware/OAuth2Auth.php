@@ -18,7 +18,7 @@ class OAuth2Auth extends \Slim\Middleware {
                                 '/uploadPicture',
                                 '/deletePicture',
                                 '/getMyUserInfo',
-                                '/setUserDesc',
+                                '/setMyUserInfo',
                                 '/sendInvitation',
                                 '/rejectInvitation',
                                 '/acceptInvitation',
@@ -30,7 +30,9 @@ class OAuth2Auth extends \Slim\Middleware {
                                 '/sendMessage',
                                 '/viewMessages',
                                 '/addBlackListedContact',
-                                '/unregister'
+                                '/unregister',
+                                '/getMyPictures',
+                                '/getMyContacts'
                             );
     }
     

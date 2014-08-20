@@ -31,19 +31,19 @@ class RegisterController {
     public function register() {
         $app = \Slim\Slim::getInstance();
         $app->post('/register', function() use ($app) {
-            $fields = array('name', 'mail', 'password', 'sex', 'age', 'desc');
+            $fields = array('name', 'mail', 'password', 'sex', 'age', 'description');
             $this->helper->verifyRequiredParams($fields);
             $params = $this->helper->constructParamsArray($fields, 'post');
             
             $this->helper->validateEmail($params['mail']);
             
-            if(!$this->uh->isUserExistsByMail($params['mail'])) {
+            if(!$this->uh->isUserExistByMail($params['mail'])) {
                 $res = $this->uh->createUser(   $params['name'],
                                                 $params['password'],
                                                 $params['mail'],
-                                                $params['sex'],
                                                 $params['age'],
-                                                $params['desc']);
+                                                $params['sex'],
+                                                $params['description']);
                 if($res) $this->helper->simpleRender(REGISTER_SUCCESS, false, 201);
                 else $this->helper->simpleRender(REGISTER_ERROR, true, 200);
             } else $this->helper->simpleRender(USER_ALREADY_EXISTED, true, 200);
@@ -68,14 +68,11 @@ class RegisterController {
      */
     public function isNewUser() {
         $app = \Slim\Slim::getInstance();
-        $app->get('/isNewUser', function() use ($app) {
-            $fields = array('mail');
-            $this->helper->verifyRequiredParams($fields);
-            $params = $this->helper->constructParamsArray($fields, 'get');
+        $app->get('/isNewUser/:mail', function($mail) use ($app) {
             
-            $this->helper->validateEmail($params['mail']);
+            $this->helper->validateEmail($mail);
             
-            if(!$this->uh->isUserExistsByMail($params['mail'])) $this->helper->simpleRender(USER_NOT_EXISTS, false, 200);
+            if(!$this->uh->isUserExistByMail($mail)) $this->helper->simpleRender(USER_NOT_EXISTS, false, 200);
             else $this->helper->simpleRender(USER_EXISTS, true, 200);
         });
     }

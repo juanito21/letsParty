@@ -24,6 +24,7 @@ class ContactController {
         $this->ch = new ContactHandler($myConn, $this->uh);
         $this->deleteContact();
         $this->addBlackListedContact();
+        $this->getMyContacts();
     }
     
     /**
@@ -49,6 +50,10 @@ class ContactController {
         });
     }
     
+    
+   /**
+    * Add a blacklisted contact, matched by HTTP POST method
+    */
     public function addBlackListedContact() {
         $app = \Slim\Slim::getInstance();
         $app->post('/addBlackListedContact', function() use ($app) {
@@ -69,6 +74,24 @@ class ContactController {
                 $this->helper->simpleRender(BLACKLIST_ERROR, true, 200);
                 return;
             } else $this->helper->simpleRender(BLACKLIST_SUCCESS, false, 200);
+        });
+    }
+    
+    public function getMyContacts() {
+        $app = \Slim\Slim::getInstance();  
+        $app->get('/getMyContacts', function() use ($app) {
+            global $userId;
+            $res = $this->ch->getContacts($userId);
+            $resContact = array();
+            foreach($res as $key => $value) {
+                if($value[C_SENDER] != $userId) $idContact = $value[C_SENDER];
+                else $idContact = $value[C_RECEIVER];
+                if($contact = $this->uh->getUserById($idContact)) {
+                    $resContact[] = $contact;
+                } else $this->helper->simpleRender(GET_CONTACTS_ERROR, true, 200);
+            }
+            if($res) $this->helper->simpleRenderData(GET_CONTACTS_SUCCESS, false, 200, array('contacts'=> $resContact));
+            else $this->helper->simpleRender(GET_CONTACTS_ERROR, true, 200);
         });
     }
 }

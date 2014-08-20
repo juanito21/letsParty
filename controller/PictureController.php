@@ -24,7 +24,7 @@ class PictureController {
         $this->ph = new PictureHandler($myConn, $this->uh);
         $this->uploadPicture();
         $this->deletePicture();
-       
+        $this->getMyPictures();
     }
     
     /**
@@ -41,11 +41,11 @@ class PictureController {
                         if($nbPicture<LIMIT_PICTURES_BY_USER) {
                             $temp = explode(".", $_FILES['upload']['name']);
                             $extension = end($temp);
-                            if($name = $this->ph->insertPicture($userId, $extension)) {
-                                if(savingUploadedFile($_FILES['upload'], $name))
-                                        $this->helper->simpleRenderData(PICTURE_UPLOADED, false, 201, array($name));
+                            if($res = $this->ph->insertPicture($userId, $extension)) {
+                                if(savingUploadedFile($_FILES['upload'], $res['name']))
+                                        $this->helper->simpleRenderData(PICTURE_UPLOADED, false, 201, array('picture' => $res));
                                 else $this->helper->simpleRender(PICTURE_UPLOADED_ERROR, true, 200);
-                            } else $this->helper->simpleRender(PICTURE_DATABASE_ERROR, false, 200);
+                            } else $this->helper->simpleRender(PICTURE_DATABASE_ERROR, true, 200);
                         } else $this->helper->simpleRender(TOO_MANY_PICTURES, true, 201);
                     } else $this->helper->simpleRender(PICTURE_DATABASE_ERROR, false, 201);
                 } else $this->helper->simpleRender(FILE_INCORRECT, true, 200);
@@ -60,9 +60,24 @@ class PictureController {
         $app = \Slim\Slim::getInstance();
         $app->delete('/deletePicture/:name', function($name) use ($app) {
             if($this->ph->deletePicture($name)) {
-                if(deletePictureFromDisk($name)) $this->helper->simpleRender (PICTURE_DELETED, false, 200);
+                if(deletePictureFromDisk($name)) $this->helper->simpleRender(PICTURE_DELETED, false, 200);
+                else $this->helper->simpleRender(PICTURE_DELETED_ERROR, true, 200);
             }
-            else $this->helper->simpleRender (PICTURE_DELETED_ERROR, false, 200);
+            else $this->helper->simpleRender(PICTURE_DELETED_ERROR, true, 200);
+            
+        });
+    }
+    
+    /**
+     * Get all my pictures, matched by HTTP GET method
+     */
+    public function getMyPictures() {
+        $app = \Slim\Slim::getInstance();
+        $app->get('/getMyPictures', function() use ($app) {
+            global $userId;
+            if($res = $this->ph->getPictures($userId)) {
+               $this->helper->simpleRenderData(GET_PICTURES_SUCCESS, false, 200, array('pictures' => $res));
+            } else $this->helper->simpleRender (GET_PICTURES_ERROR, true, 200);
             
         });
     }

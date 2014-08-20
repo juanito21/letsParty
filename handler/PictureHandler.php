@@ -26,21 +26,24 @@ class PictureHandler extends Handler {
      * @param string $extension
      * @return string|false
      */
-    function insertPicture($id, $extension) {
+    function insertPicture($idUser, $extension) {
         $this->conn->beginTransaction();
         $tmp = "tmp";
-        
+      
         $sql = "INSERT INTO " . T_PICTURES . " (".P_NAME.", ".P_USER.") VALUES (?,?)";
-        $params = array($tmp, $id);
+        $params = array($tmp, $idUser);
         if(!parent::preparedUpdate($sql, $params)) return false;
         $idPicture = $this->conn->lastInsertId();
         $sql = "UPDATE " . T_PICTURES . " SET " . P_NAME . " = ? WHERE " . P_ID . " = ?";
-        $name = $id . "_" . $idPicture . "." . $extension;
+        $name = $idUser . "_" . $idPicture . "." . $extension;
         $params = array($name, $idPicture);
         if(!parent::preparedUpdate($sql, $params)) return false;
+        $sql = "SELECT " . P_ID . ", " . P_NAME . " FROM " . T_PICTURES . " WHERE " . P_ID . " = ?";
+        $params = array($idPicture);
+        if(!$res = parent::preparedQueryFirst($sql, $params, PDO::FETCH_ASSOC)) return false;
         
         $this->conn->commit();
-        return $name;
+        return $res;
     }
     
     /**
@@ -63,6 +66,17 @@ class PictureHandler extends Handler {
        $sql = "DELETE FROM " . T_PICTURES . " WHERE " . P_NAME . " = ?";
        $params = array($name);
        return parent::preparedUpdate($sql, $params);
+    }
+    
+    /**
+     * Get all user pictures
+     * @param int $id
+     * @return array or false
+     */
+    function getPictures($id) {
+        $sql = "SELECT * FROM " . T_PICTURES . " WHERE " . P_USER . " = ?";
+        $params = array($id);
+        return parent::preparedQueryAll($sql, $params, PDO::FETCH_ASSOC);
     }
 
 }

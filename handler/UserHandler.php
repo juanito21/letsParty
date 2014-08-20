@@ -22,7 +22,7 @@ class UserHandler extends Handler {
      * @param string $desc
      * @return boolean
      */
-    function createUser($name, $password, $mail, $age, $sex, $age, $desc) {
+    function createUser($name, $password, $mail, $age, $sex, $desc) {
         $sql = "INSERT INTO " . T_USERS . " (".U_MAIL.",".U_NAME.",".U_SEX.",".U_AGE.",".U_DESC.",".U_STATUS.",".U_ACTIVE.",".U_CREATED_AT.",".U_PASS_HASH.",".U_API_KEY.")"
                 . "VALUES (?,?,?,?,?,?,?,now(),?,?)";
         $passHash = PassHash::hash($password);
@@ -138,7 +138,7 @@ class UserHandler extends Handler {
     public function checkLogin($mail, $password) {
         $sql = "SELECT * FROM " . T_USERS . " WHERE " . U_MAIL . " = ?";
         $params = array($mail);
-        $user = parent::preparedQuery($sql, $params, PDO::FETCH_ASSOC);
+        $user = parent::preparedQueryFirst($sql, $params, PDO::FETCH_ASSOC);
         if($user) {
             if(count($user)>0) {
                 if(PassHash::check_password($user[U_PASS_HASH], $password)) return $user;
@@ -179,6 +179,73 @@ class UserHandler extends Handler {
         $sql = "UPDATE " . T_USERS . " SET " . U_DESC . " = ? WHERE " . U_ID . " = ?";
         $params = array($desc, $id);
         return parent::preparedUpdate($sql, $params);
+    }
+    
+    /**
+     * Set user name
+     * @param int $id
+     * @param string $name
+     * @return boolean
+     */
+    public function setUserName($id, $name) {
+        $sql = "UPDATE " . T_USERS . " SET " . U_NAME . " = ? WHERE " . U_ID . " = ?";
+        $params = array($name, $id);
+        return parent::preparedUpdate($sql, $params);
+    }
+    
+    /**
+     * Set user age
+     * @param int $id
+     * @param int $age
+     * @return boolean
+     */
+    public function setUserAge($id, $age) {
+        $sql = "UPDATE " . T_USERS . " SET " . U_AGE . " = ? WHERE " . U_ID . " = ?";
+        $params = array($age, $id);
+        return parent::preparedUpdate($sql, $params);
+    }
+    
+    /**
+     * Set user sex
+     * @param int $id
+     * @param int $sex
+     * @return boolean
+     */
+    public function setUserSex($id, $sex) {
+        $sql = "UPDATE " . T_USERS . " SET " . U_SEX . " = ? WHERE " . U_ID . " = ?";
+        $params = array($sex, $id);
+        return parent::preparedUpdate($sql, $params);
+    }
+    
+    /**
+     * Set user activity
+     * @param int $id
+     * @param int $active
+     * @return boolean
+     */
+    public function setUserActive($id, $active) {
+        $sql = "UPDATE " . T_USERS . " SET " . U_ACTIVE . " = ? WHERE " . U_ID . " = ?";
+        $params = array($active, $id);
+        return parent::preparedUpdate($sql, $params);
+    }
+    
+    /**
+     * Set the user info
+     * @param int $id
+     * @param string $name
+     * @param string $description
+     * @param int $sex
+     * @param int $age
+     * @return boolean
+     */
+    public function setUserInfo($id, $name, $description, $sex, $age) {
+        $this->conn->beginTransaction();
+        if(!$this->setUserName($id, $name)) return false;
+        if(!$this->setUserSex($id, $sex)) return false;
+        if(!$this->setUserAge($id, $age)) return false;
+        if(!$this->setUserDesc($id, $description)) return false;
+        $this->conn->commit();
+        return true;
     }
     
     /**

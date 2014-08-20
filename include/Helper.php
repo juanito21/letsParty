@@ -24,7 +24,7 @@ class Helper {
     public function validateEmail($email) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $response["error"] = true;
-            $response["message"] = 'Email address is not valid';
+            $response["message"] = 'Email address is not valid ' . $email;
             $this->render(400, $response);
             $this->app->stop();
         }
@@ -40,7 +40,7 @@ class Helper {
         $res = array();
         foreach($array as $param) {
             if($method == 'post') $res[$param] = $this->app->request->post($param);
-            if($method == 'get') $res[$param] = $this->app->request->get($param);
+            if($method == 'put') $res[$param] = $this->app->request->put($param);
         } return $res;
     }
   

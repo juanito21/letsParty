@@ -20,7 +20,8 @@ class UserController {
         $this->uh = new UserHandler($myConn);
         $this->getUserInfo();
         $this->getMyUserInfo();
-        $this->setUserDesc();
+        $this->setUserInfo();
+        $this->setUserActive();
     }
     
     /**
@@ -30,7 +31,7 @@ class UserController {
         $app = \Slim\Slim::getInstance();  
         $app->get('/getUserInfo/:id', function($id) use ($app) { 
             $res = $this->uh->getUserById($id);
-            if($res) $this->helper->simpleRenderData(GET_USER_SUCCESS, false, 200, $res);
+            if($res) $this->helper->simpleRenderData(GET_USER_SUCCESS, false, 200, array('user' => $res));
             else $this->helper->simpleRender(GET_USER_ERROR, true, 200);
         });
     }
@@ -43,20 +44,43 @@ class UserController {
         $app->get('/getMyUserInfo', function() use ($app) {
             global $userId;
             $res = $this->uh->getUserById($userId);
-            if($res) $this->helper->simpleRenderData(GET_USER_SUCCESS, false, 200, $res);
+            if($res) $this->helper->simpleRenderData(GET_USER_SUCCESS, false, 200, array('user'=> $res));
             else $this->helper->simpleRender(GET_USER_ERROR, true, 200);
         });
     }
     
     /**
-     * Get my user info, matched by HTTP GET method
+     * Set my user info, matched by HTTP PUT method
      */
-    public function setUserDesc() {
+    public function setUserInfo() {
         $app = \Slim\Slim::getInstance();  
-        $app->put('/setUserDesc/:desc', function($desc) use ($app) { 
+        $app->put('/setMyUserInfo', function() use ($app) { 
+            $fields = array('name', 'age', 'sex', 'description');
+            $this->helper->verifyRequiredParams($fields);
+            $params = $this->helper->constructParamsArray($fields, 'put');
             global $userId;
-            $res = $this->uh->setUserDesc($userId, $desc);
-            if($res) $this->helper->simpleRenderData(SET_USER_SUCCESS, false, 200, $res);
+            $res = $this->uh->setUserInfo(  $userId, 
+                                            $params['name'],
+                                            $params['description'],
+                                            $params['sex'],
+                                            $params['age']);
+            if($res) $this->helper->simpleRender(SET_USER_SUCCESS, false, 200);
+            else $this->helper->simpleRender(SET_USER_ERROR, true, 200);
+        });
+    }
+        
+    /**
+    * Set my activity, matched by HTTP PUT method
+    */
+    public function setUserActive() {
+        $app = \Slim\Slim::getInstance();  
+        $app->put('/setUserActive', function($description) use ($app) { 
+            $fields = array('active');
+            $this->helper->verifyRequiredParams($fields);
+            $params = $this->helper->constructParamsArray($fields, 'put');
+            global $userId;
+            $res = $this->uh->setUserActive($userId, $params['active']);
+            if(!$res) $this->helper->simpleRender(SET_USER_SUCCESS, false, 200);
             else $this->helper->simpleRender(SET_USER_ERROR, true, 200);
         });
     }

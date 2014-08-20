@@ -32,16 +32,19 @@ class ConnectController {
             $this->helper->validateEmail($mail);
             
             if($this->uh->isUserExistByMail($mail)) {
-                if(!$this->uh->isUserConnectedByMail($mail)) {
-                    if($user = $this->uh->checkLogin($mail, $pass)) {
+                if($user = $this->uh->checkLogin($mail, $pass)) {
+                    if(!$this->uh->isUserConnectedById($user[U_ID])) {
                         $res = $this->uh->setStatusUser($user[U_ID], CONNECTED_STATUS);
                         if($res) {
-                            $this->helper->simpleRenderData(CONNECT_SUCCESS, false, 201, $user);
+                            $this->helper->simpleRenderData(CONNECT_SUCCESS, false, 201, array('user' => $user));
                             $res = $this->uh->updateLastConnection($mail);
                         }
                         else $this->helper->simpleRender(CONNECT_ERROR, true, 200);
-                    } else $this->helper->simpleRender(WRONG_LOG, true, 200);
-                } else $this->helper->simpleRender(USER_ALREADY_CONNECTED, true, 200);
+                    } else {
+                        $this->helper->simpleRenderData(USER_ALREADY_CONNECTED, false, 200, array('user' => $user));
+                        $res = $this->uh->updateLastConnection($mail);
+                    }
+                } else $this->helper->simpleRender(WRONG_LOG, true, 200);
             } else $this->helper->simpleRender(WRONG_LOG, true, 200);
         });  
     }
@@ -51,8 +54,9 @@ class ConnectController {
      */
     public function disconnect() {
         $app = \Slim\Slim::getInstance();  
-        $app->put('/disconnect/:id', function($id) use ($app) {
-            $res = $this->uh->setStatusUser($id, DISCONNECTED_STATUS);
+        $app->put('/disconnect', function() use ($app) {
+            global $userId;
+            $res = $this->uh->setStatusUser($userId, DISCONNECTED_STATUS);
             if($res) $this->helper->simpleRender(DISCONNECT_SUCCESS, false, 201);
             else $this->helper->simpleRender(DISCONNECT_ERROR, true, 200);
         });  

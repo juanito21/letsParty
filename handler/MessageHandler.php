@@ -51,7 +51,7 @@ class MessageHandler extends Handler {
      * @return boolean
      */
     public function getMessages($sender, $receiver) {
-        $sql = "SELECT * FROM " . T_MESSAGES . " WHERE (".M_SENDER.",".M_RECEIVER.") IN ((?,?),(?,?))";
+        $sql = "SELECT * FROM " . T_MESSAGES . " WHERE (".M_SENDER.",".M_RECEIVER.") IN ((?,?),(?,?)) ORDER BY " . M_ID . " DESC";
         $params = array($sender, $receiver, $receiver, $sender);
         return parent::preparedQueryAll($sql, $params, PDO::FETCH_ASSOC);
     }

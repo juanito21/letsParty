@@ -65,7 +65,7 @@ class ContactHandler extends Handler {
      * @return boolean
      */
     public function isBlackListed($sender, $receiver) {
-        $sql = "SELECT COUNT(*) FROM " . T_BLACKLIST . " WHERE " . C_SENDER . " = ? AND " . C_RECEIVER . " = ?";
+        $sql = "SELECT COUNT(*) FROM " . T_BLACKLIST . " WHERE " . B_SENDER . " = ? AND " . B_RECEIVER . " = ?";
         $params = array($sender, $receiver);
         return (parent::preparedQueryCount($sql, $params)>0);
     }
@@ -81,6 +81,17 @@ class ContactHandler extends Handler {
                 . "((?,?),(?,?))";
         $params = array($sender, $receiver, $receiver, $sender);
         return (parent::preparedQueryCount($sql, $params)>0);
+    }
+    
+    /**
+     * Get contacts
+     * @param int $id
+     * @return array or false
+     */
+    public function getContacts($id) {
+        $sql = "SELECT * FROM " . T_CONTACTS . " WHERE " . C_SENDER . " = ? OR " . C_RECEIVER . " = ?";
+        $params = array($id, $id);
+        return parent::preparedQueryAll($sql, $params, PDO::FETCH_ASSOC);
     }
     
 }

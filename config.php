@@ -93,6 +93,7 @@ define('SEND_INVITATION_ERROR', 'An error was detected while sending invitation.
 define('INVITATION_YOURSELF_ERROR', 'You cannot invite yourself...');
 define('REJECT_YOURSELF_ERROR', 'You cannot reject yourself...');
 define('ACCEPT_YOURSELF_ERROR', 'You cannot accept yourself...');
+define('CANCEL_YOURSELF_ERROR', 'You cannot cancel yourself...');
 define('INVATION_USER_NOT_ACTIVE', 'This person does not want to have party tonight...');
 define('INVITATION_ALREADY_REJECTED', 'You have to wait to resend an invitation rejected...');
 define('INVITATION_ALREADY_SENT', 'You have already sent an invitation to this user...');
@@ -118,6 +119,8 @@ define('BLACKLIST_ERROR', 'An error was detected while adding this contact in yo
 define('BLACKLIST_SUCCESS', 'Blacklisted with success !');
 define('BLACKLIST_YOURSELF_ERROR', 'You cannot blacklisted yourself...');
 define('ALREADY_BLACKLISTED', 'This contact is already in you black list...');
+define('GET_CONTACTS_SUCCESS', 'Contacts loaded with success !');
+define('GET_CONTACTS_ERROR', 'An error was detected while getting contacts...');
 
 // MESSAGE
 define('MESSAGE_YOURSELF', 'You cannot send a message to yourself...');
@@ -133,6 +136,8 @@ define('GET_USER_SUCCESS', 'User loaded with success !');
 define('GET_USER_ERROR', 'An error was detected while getting user...');
 define('GET_MESSAGES_SUCCESS', 'Messages loaded with success !');
 define('GET_MESSAGES_ERROR', 'An error was detected while getting messages...');
+define('GET_PICTURES_SUCCESS', 'Pictures from DB loaded with success !');
+define('GET_PICTURES_ERROR', 'An error was detected while getting pictures from DB...');
 
 // SETTER
 define('SET_USER_SUCCESS', 'User set with success !');

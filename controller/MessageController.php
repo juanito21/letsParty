@@ -59,15 +59,15 @@ class MessageController {
      */
     public function getMessages() {
         $app = \Slim\Slim::getInstance();
-        $app->put('/getMessages/:id', function($id) use ($app) {
+        $app->get('/getMessages/:contact', function($contact) use ($app) {
             global $userId;
-            if(!$this->ch->isContactExist($userId, $id)) {
+            if(!$this->ch->isContactExist($userId, $contact)) {
                 $this->helper->simpleRender(CONTACT_DOES_NOT_EXIST, true, 200);
                 return;
-            } else if(!$res = $this->mh->getMessages($userId, $id)) {
+            } else if(!$res = $this->mh->getMessages($userId, $contact)) {
                 $this->helper->simpleRender(GET_MESSAGES_ERROR, true, 200);
                 return;
-            } else $this->helper->simpleRenderData(GET_MESSAGES_SUCCESS, false, 200, $res);   
+            } else $this->helper->simpleRenderData(GET_MESSAGES_SUCCESS, false, 200, array('messages' => $res));   
         });
     }
     
@@ -76,12 +76,12 @@ class MessageController {
      */
     public function viewMessages() {
         $app = \Slim\Slim::getInstance();
-        $app->put('/viewMessages/:id', function($id) use ($app) {
+        $app->put('/viewMessages/:contact', function($contact) use ($app) {
             global $userId;
-            if(!$this->ch->isContactExist($userId, $id)) {
+            if(!$this->ch->isContactExist($userId, $contact)) {
                 $this->helper->simpleRender(CONTACT_DOES_NOT_EXIST, true, 200);
                 return;
-            } else if(!$this->mh->setViewAt($userId, $id)) {
+            } else if(!$this->mh->setViewAt($userId, $contact)) {
                 $this->helper->simpleRender(SET_VIEWAT_MESSAGES_ERROR, true, 200);
                 return;
             } else $this->helper->simpleRender(SET_VIEWAT_MESSAGES_SUCCESS, false, 200);   
